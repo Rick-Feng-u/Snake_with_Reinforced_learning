@@ -6,7 +6,7 @@ from snake_game import SnakeGameRL, Direction, Point
 from model import Linear_QNet, QTrainer
 from helper import plot
 
-MAX_MEMORY = 200_000 # can change
+MAX_MEMORY = 100_000 # can change
 BATCH_SIZE = 1000 # can change
 LR = 0.001 # can change
 
@@ -17,8 +17,8 @@ class Agent:
         self.epsilon = 0 # randomness
         self.gamma = 0.85 # discount rate
         self.memeory = deque(maxlen = MAX_MEMORY) # popleft() if its exceed the memeory limit
-        self.model = Linear_QNet(11, 200, 3)
-        self.trainer = QTrainer(self.model, lr = LR, gamma = self.gamma)
+        self.model = Linear_QNet(11, 256, 3)
+        self.trainer = QTrainer(self.model, LR = LR, gamma = self.gamma)
         # TODO: model, trainer
 
     def getState(self, game):
@@ -92,13 +92,13 @@ class Agent:
         self.epsilon = 80 - self.num_games # can change
         final_move = [0,0,0]
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2) # this will give a random move to perform
+            move = random.randint(0, 2)
             final_move[move] = 1
             #as the game train, epsilon gets smaller
             #and as the epsilon gets smaller its harder for random.randint(0, 200) to get a smaller number
             #threfore, there is less random moves
         else:
-            state0 = torch.tensor(state, dtype = torch.float)
+            state0 = torch.tensor(state, dtype=torch.float)
             prediction = self.model(state0)
             move = torch.argmax(prediction).item()
             final_move[move] = 1
@@ -117,10 +117,10 @@ def train():
         stateOld = agent.getState(game)
 
         #get move based on this current state
-        final_move =  agent.getAction(stateOld)
+        final_move = agent.getAction(stateOld)
 
         #perform move and get new state
-        reward, done, score = game.play_step(final_move)
+        reward, game_over, score = game.play_step(final_move)
         stateNew = agent.getState(game)
 
         #train short memoery 

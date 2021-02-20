@@ -8,12 +8,12 @@ pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
 #font = pygame.font.SysFont('arial', 25)
 
-#reset
-#reward
-#def play(action):
-#   diraction
-#frame
-#is_collision 
+# reset
+# reward
+# def play(action):
+# diraction
+# frame
+# is_collision 
 
 class Direction(Enum):
     RIGHT = 1
@@ -109,7 +109,7 @@ class SnakeGameRL:
         self._update_ui()
         self.clock.tick(SPEED)
         # 6. return game over and score
-        return game_over, self.score
+        return reward, game_over, self.score
     
     def is_collision(self, point = None):
         if point is None:
