@@ -135,7 +135,7 @@ def train():
 
             if score > record:
                 record = score
-                # TODO agent.model.save()
+                agent.model.save()
 
             print("Game: ", agent.num_games, "Score: ", score, "highest score currently: ", record)
 
