@@ -48,9 +48,9 @@ class QTrainer:
 
         #now we impelment Bellman equation for model
         # 1. predicted Q value using current state
-        predi = = self.model(state)
+        predi = self.model(state)
 
-        target = prd.clone()
+        target = predi.clone()
         for index in range(len(game_over)):
             Q_new = reward[index]
             if not game_over[index]:
@@ -67,5 +67,5 @@ class QTrainer:
         loss.backward()
 
         self.optimizer.step()
-        
+
 
