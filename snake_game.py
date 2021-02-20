@@ -2,7 +2,7 @@ import pygame
 import random
 from enum import Enum
 from collections import namedtuple
-import numpy
+import numpy as np
 
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
@@ -141,33 +141,26 @@ class SnakeGameRL:
         close_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
         index = close_wise.index(self.direction)
 
+        if np.array_equal(action , [1,0,0]):
+            new_dir = close_wise[index] # no change, go straight
+        elif np.array_equal(action , [0,1,0]):
+            nextIndex = (index + 1) % 4
+            new_dir = close_wise[nextIndex] # right turn
+        else: # left turn [0,0,1], lazy so no if
+            nextIndex = (index - 1) % 4
+            new_dir = close_wise[nextIndex]
 
+        self.direction = new_dir
 
         x = self.head.x
         y = self.head.y
-        if direction == Direction.RIGHT:
+        if self.direction == Direction.RIGHT:
             x += BLOCK_SIZE
-        elif direction == Direction.LEFT:
+        elif self.direction == Direction.LEFT:
             x -= BLOCK_SIZE
-        elif direction == Direction.DOWN:
+        elif self.direction == Direction.DOWN:
             y += BLOCK_SIZE
-        elif direction == Direction.UP:
+        elif self.direction == Direction.UP:
             y -= BLOCK_SIZE
             
-        self.head = Point(x, y)
-            
-
-if __name__ == '__main__':
-    game = SnakeGame()
-    
-    # game loop
-    while True:
-        game_over, score = game.play_step()
-        
-        if game_over == True:
-            break
-        
-    print('Final Score', score)
-        
-        
-    pygame.quit()
+        self.head = Point(x, y)     
