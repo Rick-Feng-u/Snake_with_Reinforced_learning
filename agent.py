@@ -4,9 +4,9 @@ import numpy as np
 from collections import deque
 from snake_game import SnakeGameRL, Direction, Point
 
-MAX_MEMORY = 200_000
-BATCH_SIZE = 1000
-LR = 0.001
+MAX_MEMORY = 200_000 # can change
+BATCH_SIZE = 1000 # can change
+LR = 0.001 # can change
 
 class Agent:
 
@@ -66,16 +66,42 @@ class Agent:
         return np.array(state, dtype=int) # so bascially turning true = 1 and false = 0 (very big brain)
 
     def remember(self, state, action, reward, nextState, game_over):
-        self.memeory.append(state, action, reward, nextState, game_over)
+        self.memeory.append((state, action, reward, nextState, game_over))
 
     def train_long_memeory(self):
-        pass
+        if len(self.memeory) > BATCH_SIZE: #make sure there is items to use
+            mini_sample = random.sample(self.memeory, BATCH_SIZE) # liost of tuples
+        else:
+            mini_sample = self.memeory # just take the entire memoery if its smaller than the batch size
+
+        stateS, actionS, rewardS, nextStateS, game_overS = zip(*mini_sample) # put everything states, actions ... together, could of used a for loop but this is easier in Pytorch
+        #for state, action, reward, nextState, game_over in mini_sample:
+        #    self.trainer.train_step(state, action, reward, nextState, game_over)
+
+        self.trainer.train_step(stateS, actionS, rewardS, nextStateS, game_overS)
 
     def train_short_memeory(self, state, action, reward, nextState, game_over): # one step
-        self
+        self.trainer.train_step(state, action, reward, nextState, game_over) # just train one game step
 
     def getAction(self,state):
-        pass
+        # trade off exploration / exploitation 
+        # as the number of games getting larger, less random move is desired 
+
+        self.epsilon = 80 - self.num_games # can change
+        final_move = [0,0,0]
+        if random.randint(0, 200) < self.epsilon:
+            move = random.randint(0, 2) # this will give a random move to perform
+            final_move[move] = 1
+            #as the game train, epsilon gets smaller
+            #and as the epsilon gets smaller its harder for random.randint(0, 200) to get a smaller number
+            #threfore, there is less random moves
+        else:
+            state0 = torch.tensor(state, dtype = torch.float)
+            prediction = self.model.predict(state0)
+            move = torch.argmax(prediction).item()
+            final_move[move] = 1
+        
+        return final_move
 
 def train():
     plot_score = [] # for plotting
